@@ -1,0 +1,14 @@
+div {
+  text-align: center;
+  width:100%;
+}
+
+.header {
+  height: 40px;
+  padding-top:10px;
+  color: white;
+  background-color: black;
+  margin: 0 auto;
+  margin-bottom: 10px;
+  vertical-align: middle;
+}

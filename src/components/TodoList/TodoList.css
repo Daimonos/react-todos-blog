@@ -1,0 +1,18 @@
+.todo-list {
+  list-style-type:none;
+  padding:0;
+}
+
+.todo-list li {
+  margin: 6px auto;
+  text-align: left;
+  width: 300px;
+}
+
+.todo-list button {
+  background-color:black;
+  border-radius: 50%;
+  font-size: 16px;
+  color: white;
+  margin-right: 10px;
+}
