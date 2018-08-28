@@ -1,4 +1,5 @@
 import React from 'react';
+import TodoService from '../../api/todo.service';
 import TodoInput from '../TodoInput/TodoInput';
 import './TodoList.css';
 
@@ -9,12 +10,33 @@ class TodoList extends React.Component {
       todos: [],
       text: ''
     }
+    this._service = new TodoService();
   }
+
   componentWillMount() {
-    let todos = JSON.parse(localStorage.getItem("todos"));
-    console.log(todos)
-    if (todos) {
-      this.setState({ todos: todos });
+    this._loadTodosFromApi();
+  }
+
+  async _loadTodosFromApi() {
+    try {
+      let todos = await this._service.getTodos();
+      this.setState({ todos });
+    } catch(e) {
+      // You should handle this better
+      console.error(e);
+      throw e;
+    }
+  }
+
+  async _onSaveTodo() {
+    try {
+      let text = this.state.text;
+      let todo = await this._service.createTodo({todo: text});
+      this.setState(s=>{
+        return {todos: [...s.todos, todo], text:''};
+      })
+    } catch(e) {
+      alert('Error Creating Todo!');
     }
   }
 
@@ -29,12 +51,7 @@ class TodoList extends React.Component {
   onKeypress = (e) => {
     if (e.key === 'Enter') {
       if (this.state.text) {
-        this.setState(state => {
-          let todos = state.todos;
-          todos.push(state.text);
-          this.persistTodos();
-          return { todos: todos, text: '' }
-        });
+        this._onSaveTodo();
       }
       else {
         alert('Nothing to do!');
@@ -66,9 +83,9 @@ class TodoList extends React.Component {
         </div>
         <ul className="todo-list">
           {this.state.todos.map((t, index) =>
-            <li>
+            <li key = {t._id}>
               <button type="button" onClick={this.onDeleteTodo} value={index}>X</button>
-              {t}
+              {t.todo}
             </li>)
           }
         </ul>
