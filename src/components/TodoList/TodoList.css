@@ -16,3 +16,8 @@
   color: white;
   margin-right: 10px;
 }
+
+.todo-checkbox {
+  margin-left: 10px;
+  text-align:right;
+}
