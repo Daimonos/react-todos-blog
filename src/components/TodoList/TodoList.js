@@ -20,32 +20,56 @@ class TodoList extends React.Component {
   async _loadTodosFromApi() {
     try {
       let todos = await this._service.getTodos();
+      console.log(todos);
       this.setState({ todos });
-    } catch(e) {
-      // You should handle this better
+    } catch (e) {
       console.error(e);
-      throw e;
+      alert('Error Getting Todos from API');
     }
   }
 
   async _onSaveTodo() {
     try {
       let text = this.state.text;
-      let todo = await this._service.createTodo({todo: text});
-      this.setState(s=>{
-        return {todos: [...s.todos, todo], text:''};
+      let todo = await this._service.createTodo({ todo: text });
+      this.setState(s => {
+        return { todos: [...s.todos, todo], text: '' };
       })
-    } catch(e) {
+    } catch (e) {
       alert('Error Creating Todo!');
+    }
+  }
+
+  async _onDeleteTodo(todo) {
+    try {
+      let index = this.state.todos.indexOf(todo);
+      await this._service.deleteTodo(todo._id);
+      this.setState(s => {
+        let todos = s.todos;
+        todos.splice(index, 1);
+        return { todos }
+      })
+    } catch (e) {
+      alert('Error Deleting Todo');
+    }
+  }
+
+  async _onUpdateTodo(todo) {
+    try {
+      let index = this.state.todos.indexOf(todo);
+      todo = await this._service.updateTodo(todo);
+      this.setState(s=>{
+        let todos = s.todos;
+        todos.splice(index, 1, todo);
+        return {todos};
+      });
+    } catch(e) {
+      alert('Error Updating Todo!');
     }
   }
 
   onChange = (event) => {
     this.setState({ text: event.target.value });
-  }
-
-  persistTodos() {
-    localStorage.setItem("todos", JSON.stringify(this.state.todos));
   }
 
   onKeypress = (e) => {
@@ -59,14 +83,13 @@ class TodoList extends React.Component {
     }
   }
 
-  onDeleteTodo = (e) => {
-    let index = e.target.value;
-    this.setState(state => {
-      let todos = state.todos;
-      todos.splice(index, 1);
-      this.persistTodos();
-      return { todos: todos };
-    });
+  onDeleteTodo(todo) {
+    this._onDeleteTodo(todo);
+  }
+
+  onCheckTodo(todo) {
+    todo.completed = !todo.completed;
+    this._onUpdateTodo(todo);
   }
 
   render() {
@@ -83,14 +106,14 @@ class TodoList extends React.Component {
         </div>
         <ul className="todo-list">
           {this.state.todos.map((t, index) =>
-            <li key = {t._id}>
-              <button type="button" onClick={this.onDeleteTodo} value={index}>X</button>
+            <li key={t._id}>
+              <button type="button" onClick={() => this.onDeleteTodo(t)}>X</button>
               {t.todo}
+              <input type="checkbox" checked = {t.completed} className="todo-checkbox" onChange = {()=>this.onCheckTodo(t)}/>
             </li>)
           }
         </ul>
       </div>
-
     );
   }
 }

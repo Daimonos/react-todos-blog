@@ -22,6 +22,21 @@ class Api {
     .then(r=>r.json());
   }
 
+  delete(endpoint) {
+    return fetch(API_URI+endpoint, {
+      method:'DELETE',
+      headers: headers
+    })
+    .then(r=>r.json());
+  }
+
+  put(endpoint, body) {
+    return fetch(API_URI+endpoint, {
+      method:'PUT',
+      headers: headers,
+      body: JSON.stringify(body)
+    }).then(r=>r.json())
+  }
 }
 
 export default Api;
